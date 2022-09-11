@@ -3,6 +3,7 @@ import java.awt.*;
 import javax.swing.*;
 
 public class TrackScreen extends JPanel{
+    public static int width = 1920, height = 1080;
     Image track;
     P1 p1;
     Car player;
@@ -12,10 +13,6 @@ public class TrackScreen extends JPanel{
         //track = (new ImageIcon("src/main/resources/track.png")).getImage();
         p1 = new P1(this);
         player = new Car(this);
-
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {}
 
         addKeyListener(player);
         setFocusable(true);
@@ -30,19 +27,13 @@ public class TrackScreen extends JPanel{
 
     public static void main(String[] args)
     {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
         JFrame frame = new JFrame("P1");
         TrackScreen trackscreen = new TrackScreen();
         frame.add(trackscreen);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(screenSize.width, screenSize.height);
+        frame.setSize(width, height);
         frame.setResizable(false);
         frame.setVisible(true);
         frame.setFocusable(false);
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {}
     }
 }

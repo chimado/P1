@@ -4,19 +4,21 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import static org.chimado.TrackScreen.height;
+
 public class Car extends Thread implements KeyListener {
     TrackScreen panel;
 
     private final int playerWidth = 50, playerHeight = 70;;
-    public int playerX = 0, playerY = 0, velocity = 0;
+    public int playerX = 0, playerY = height / 2, velocity = 0;
     Rectangle hitBox = new Rectangle();
     Image Texture;
 
     public Car(TrackScreen panel)
     {
         this.panel = panel;
-        hitBox.setBounds(playerX,playerY,playerWidth,playerHeight);
-        //Texture = new ImageIcon("src/main/resources/car.png").getImage();
+        hitBox.setBounds(playerX, playerY, playerWidth, playerHeight);
+        Texture = new ImageIcon("src/main/resources/carStationary.png").getImage();
 
         start();
     }
@@ -36,7 +38,7 @@ public class Car extends Thread implements KeyListener {
     }
 
     private void updatePlayer() {
-        playerY += velocity;
+        playerY -= velocity;
 
         hitBox.x = playerX;
         hitBox.y = playerY;
