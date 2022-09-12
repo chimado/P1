@@ -26,4 +26,8 @@ public class Animation{
         }
         return images.get(currentFrame);
     }
+
+    public void setInterval(int interval){
+        this.interval = interval;
+    }
 }

@@ -16,9 +16,9 @@ import static org.chimado.TrackScreen.height;
 public class Car extends Thread implements KeyListener {
     TrackScreen panel;
 
-    private final Set<Character> pressedKeys = new HashSet<Character>();
-    private final int playerWidth = 50, playerHeight = 70;
-    private final float baseAcceleration = 0.0001f, baseAngleChange = 0.1f;
+    private final Set<Character> pressedKeys = new HashSet<Character>(); // contains all the currently pressed keys
+    private final int playerWidth = 50, playerHeight = 70; // player dimensions
+    private final float baseAcceleration = 0.0001f, baseAngleChange = 0.01f, maxVelocity = 40f;
     public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false;
     private long deltaTime = 0;
@@ -36,7 +36,6 @@ public class Car extends Thread implements KeyListener {
         drivingAnimationLocations.add("src/main/resources/CarMoving2.png");
         drivingAnimationLocations.add("src/main/resources/CarMoving3.png");
 
-
         Stationary = new ImageIcon("src/main/resources/carStationary.png").getImage();
         drivingAnimation = new Animation(drivingAnimationLocations, 50);
 
@@ -48,8 +47,8 @@ public class Car extends Thread implements KeyListener {
         while(true)
         {
             start = Instant.now();
-            updatePlayer();
-            panel.repaint();
+            updatePlayer(); // update player location, velocity and angle
+            panel.repaint(); // repaints accordingly to the updated values
 
             try {
                 Thread.sleep(1);
@@ -64,22 +63,27 @@ public class Car extends Thread implements KeyListener {
         playerX += Math.sin(Math.toRadians(angle)) * velocity * deltaTime;
         playerY -= Math.cos(Math.toRadians(angle)) * velocity * deltaTime;
 
+        // update the car's velocity according to its state
         if(throttle) velocity += baseAcceleration * deltaTime;
-        else if(breaks) velocity -= baseAcceleration * deltaTime;
+        else if(breaks) velocity -= baseAcceleration * deltaTime * 10;
         else velocity -= baseAcceleration * deltaTime / 5;
 
         if(velocity < 0) velocity = 0;
-        else if(velocity >= 20) velocity = 20;
+        else if(velocity >= maxVelocity) velocity = maxVelocity;
 
-        if(right) angle += baseAngleChange * deltaTime;
-        else if(left) angle -= baseAngleChange * deltaTime;
+        // move the car's angle accordingly to its velocity and state
+        if(right) angle += baseAngleChange * deltaTime * (velocity != 0 ? 1 : 0) * (velocity < maxVelocity / 2 ? 3 : 1);
+        else if(left) angle -= baseAngleChange * deltaTime * (velocity != 0 ? 1 : 0) * (velocity < maxVelocity / 2 ? 3 : 1);
+
+        drivingAnimation.setInterval((int) velocity);
     }
 
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
         Point p = new Point((int) (playerX+playerWidth/2), (int) (playerY+playerHeight/2));
-        g2.rotate(Math.toRadians(angle), p.x,p.y);
+        g2.rotate(Math.toRadians(angle), p.x,p.y); // rotate the car to angle degrees around point p
 
+        // decide which animation to show
         if(velocity > 0){
             g2.drawImage(drivingAnimation.getImage(deltaTime), (int) playerX, (int) playerY, playerWidth, playerHeight, null);
         }
@@ -103,6 +107,7 @@ public class Car extends Thread implements KeyListener {
 
         pressedKeys.add((char) e.getKeyCode());
         Point offset = new Point();
+        // goes over all pressed keys and updates the car's states
         if (!pressedKeys.isEmpty()) {
             for (Iterator<Character> it = pressedKeys.iterator(); it.hasNext();) {
                 switch (it.next()) {
