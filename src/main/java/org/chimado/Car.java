@@ -14,8 +14,9 @@ public class Car extends Thread implements KeyListener {
     TrackScreen panel;
 
     private final Set<Character> pressedKeys = new HashSet<Character>();
-    private final int playerWidth = 50, playerHeight = 70;;
-    public int playerX = 0, playerY = height / 2, velocity = 0, angleChange = 0, angle = 0;
+    private final int playerWidth = 50, playerHeight = 70;
+    private final float timeModifier = 0.0001f, baseAcceleration = 0.000001f, baseAngleChange = 0.001f;
+    public float playerX = 0, playerY = height / 2, velocity = 0, deltaTime = 0, prevTime, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false;
     Image Texture;
 
@@ -25,50 +26,41 @@ public class Car extends Thread implements KeyListener {
         Texture = new ImageIcon("src/main/resources/carStationary.png").getImage();
 
         start();
+        prevTime = System.nanoTime() * timeModifier;
     }
 
     public void run()
     {
         while(true)
         {
+            deltaTime = System.nanoTime() * timeModifier - prevTime;
+            prevTime = System.nanoTime() * timeModifier;
+
             updatePlayer();
-
-            try {
-                Thread.sleep(20);
-            }catch (InterruptedException e) {}
-
             panel.repaint();
         }
     }
 
     private void updatePlayer() {
-        playerX -= Math.sin(angle) * velocity;
-        playerY -= Math.cos(angle) * velocity;
-        if(velocity > 0) velocity--;
+        playerX += Math.sin(Math.toRadians(angle)) * velocity * deltaTime;
+        playerY -= Math.cos(Math.toRadians(angle)) * velocity * deltaTime;
 
-        if(throttle){
-            if(velocity < 150) velocity += 3;
-        }
+        if(throttle) velocity += baseAcceleration * deltaTime;
+        else if(breaks) velocity -= baseAcceleration * deltaTime;
+        else velocity -= baseAcceleration * deltaTime / 5;
 
-        else if(breaks){
-            if (velocity > 0) velocity -= 3;
-        }
+        if(velocity < 0) velocity = 0;
+        else if(velocity >= 20) velocity = 20;
 
-        if(right){
-            angle += 1;
-        }
-
-        else if(left){
-            angle -= 1;
-        }
+        if(right) angle += baseAngleChange * deltaTime;
+        else if(left) angle -= baseAngleChange * deltaTime;
     }
 
     public void draw(Graphics g) {
-        angleChange = angle - angleChange;
         Graphics2D g2 = (Graphics2D)g;
-        Point p = new Point(playerX+playerWidth/2,playerY+playerHeight/2);
-        g2.rotate(Math.toRadians(angleChange), p.x,p.y);
-        g2.drawImage(Texture, playerX, playerY, playerWidth, playerHeight, null);
+        Point p = new Point((int) (playerX+playerWidth/2), (int) (playerY+playerHeight/2));
+        g2.rotate(Math.toRadians(angle), p.x,p.y);
+        g2.drawImage(Texture, (int) playerX, (int) playerY, playerWidth, playerHeight, null);
     }
 
     @Override
@@ -108,6 +100,21 @@ public class Car extends Thread implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        pressedKeys.remove(e.getKeyCode());
+        pressedKeys.remove((char) e.getKeyCode());
+
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_W:
+                throttle = false;
+                break;
+            case KeyEvent.VK_A:
+                left = false;
+                break;
+            case KeyEvent.VK_S:
+                breaks = false;
+                break;
+            case KeyEvent.VK_D:
+                right = false;
+                break;
+        }
     }
 }

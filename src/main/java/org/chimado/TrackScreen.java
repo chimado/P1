@@ -32,7 +32,7 @@ public class TrackScreen extends JPanel{
         frame.add(trackscreen);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(width, height);
-        frame.setResizable(false);
+        frame.setResizable(true);
         frame.setVisible(true);
         frame.setFocusable(false);
     }
