@@ -4,6 +4,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.Graphics2D;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -15,9 +17,11 @@ public class Car extends Thread implements KeyListener {
 
     private final Set<Character> pressedKeys = new HashSet<Character>();
     private final int playerWidth = 50, playerHeight = 70;
-    private final float timeModifier = 0.0001f, baseAcceleration = 0.000001f, baseAngleChange = 0.001f;
-    public float playerX = 0, playerY = height / 2, velocity = 0, deltaTime = 0, prevTime, angle = 0;
+    private final float timeModifier = 1f, baseAcceleration = 0.0001f, baseAngleChange = 0.1f;
+    public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false;
+    private long deltaTime = 0;
+    Instant start, finish;
     Image Texture;
 
     public Car(TrackScreen panel)
@@ -26,18 +30,23 @@ public class Car extends Thread implements KeyListener {
         Texture = new ImageIcon("src/main/resources/carStationary.png").getImage();
 
         start();
-        prevTime = System.nanoTime() * timeModifier;
     }
 
     public void run()
     {
         while(true)
         {
-            deltaTime = System.nanoTime() * timeModifier - prevTime;
-            prevTime = System.nanoTime() * timeModifier;
-
+            start = Instant.now();
             updatePlayer();
             panel.repaint();
+
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {}
+
+            finish = Instant.now();
+            deltaTime = Duration.between(start, finish).toMillis();
+            System.out.println(deltaTime);
         }
     }
 

@@ -23,7 +23,6 @@ public class P1 extends Thread{
             try {
                 Thread.sleep(7);
             } catch (InterruptedException e) {}
-
         }
     }
 }
