@@ -18,26 +18,75 @@ public class Car extends Thread implements KeyListener {
 
     private final Set<Character> pressedKeys = new HashSet<Character>(); // contains all the currently pressed keys
     private final int playerWidth = 50, playerHeight = 70; // player dimensions
-    private final float baseAcceleration = 0.0001f, baseAngleChange = 0.01f, maxVelocity = 40f;
+    private final float baseAcceleration = 0.0001f, baseAngleChange = 0.02f, maxVelocity = 40f;
     public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false;
-    private long deltaTime = 0;
+    private long deltaTime = 0, turnTime = 0;
     Instant start, finish;
-    Image Stationary;
-    Animation drivingAnimation;
-    ArrayList<String> drivingAnimationLocations;
+    Image Stationary, stationarySlightlyRightImage, stationaryRightImage, stationaryVeryRightImage,
+            stationarySlightlyLeftImage, stationaryLeftImage, stationaryVeryLeftImage, outImage;
+    Animation drivingAnimation, drivingSlightlyRightAnimation, drivingRightAnimation, drivingVeryRightAnimation,
+            drivingSlightlyLeftAnimation, drivingLeftAnimation, drivingVeryLeftAnimation;
+    ArrayList<String> drivingAnimationLocations, drivingSlightlyRightAnimationLocations, 
+            drivingRightAnimationLocations, drivingVeryRightAnimationLocations,
+            drivingSlightlyLeftAnimationLocations, drivingLeftAnimationLocations, drivingVeryLeftAnimationLocations;
 
     public Car(TrackScreen panel)
     {
         this.panel = panel;
-
+        
+        // image imports
         drivingAnimationLocations = new ArrayList<String>();
         drivingAnimationLocations.add("src/main/resources/CarMoving1.png");
         drivingAnimationLocations.add("src/main/resources/CarMoving2.png");
         drivingAnimationLocations.add("src/main/resources/CarMoving3.png");
 
+        drivingSlightlyRightAnimationLocations = new ArrayList<String>();
+        drivingSlightlyRightAnimationLocations.add("src/main/resources/CarMoving1SlightlyRight.png");
+        drivingSlightlyRightAnimationLocations.add("src/main/resources/CarMoving2SlightlyRight.png");
+        drivingSlightlyRightAnimationLocations.add("src/main/resources/CarMoving3SlightlyRight.png");
+        drivingRightAnimationLocations = new ArrayList<String>();
+        drivingRightAnimationLocations.add("src/main/resources/CarMoving1Right.png");
+        drivingRightAnimationLocations.add("src/main/resources/CarMoving2Right.png");
+        drivingRightAnimationLocations.add("src/main/resources/CarMoving3Right.png");
+        drivingVeryRightAnimationLocations = new ArrayList<String>();
+        drivingVeryRightAnimationLocations.add("src/main/resources/CarMoving1VeryRight.png");
+        drivingVeryRightAnimationLocations.add("src/main/resources/CarMoving2VeryRight.png");
+        drivingVeryRightAnimationLocations.add("src/main/resources/CarMoving3VeryRight.png");
+
+        drivingSlightlyLeftAnimationLocations = new ArrayList<String>();
+        drivingSlightlyLeftAnimationLocations.add("src/main/resources/CarMoving1SlightlyLeft.png");
+        drivingSlightlyLeftAnimationLocations.add("src/main/resources/CarMoving2SlightlyLeft.png");
+        drivingSlightlyLeftAnimationLocations.add("src/main/resources/CarMoving3SlightlyLeft.png");
+        drivingLeftAnimationLocations = new ArrayList<String>();
+        drivingLeftAnimationLocations.add("src/main/resources/CarMoving1Left.png");
+        drivingLeftAnimationLocations.add("src/main/resources/CarMoving2Left.png");
+        drivingLeftAnimationLocations.add("src/main/resources/CarMoving3Left.png");
+        drivingVeryLeftAnimationLocations = new ArrayList<String>();
+        drivingVeryLeftAnimationLocations.add("src/main/resources/CarMoving1VeryLeft.png");
+        drivingVeryLeftAnimationLocations.add("src/main/resources/CarMoving2VeryLeft.png");
+        drivingVeryLeftAnimationLocations.add("src/main/resources/CarMoving3VeryLeft.png");
+
         Stationary = new ImageIcon("src/main/resources/carStationary.png").getImage();
+        
+        stationarySlightlyRightImage = new ImageIcon("src/main/resources/carSlightlyRight.png").getImage();
+        stationaryRightImage = new ImageIcon("src/main/resources/carRight.png").getImage();
+        stationaryVeryRightImage = new ImageIcon("src/main/resources/carVeryRight.png").getImage();
+
+        stationarySlightlyLeftImage = new ImageIcon("src/main/resources/carSlightlyLeft.png").getImage();
+        stationaryLeftImage = new ImageIcon("src/main/resources/carLeft.png").getImage();
+        stationaryVeryLeftImage = new ImageIcon("src/main/resources/carVeryLeft.png").getImage();
+        
         drivingAnimation = new Animation(drivingAnimationLocations, 50);
+
+        drivingSlightlyRightAnimation = new Animation(drivingSlightlyRightAnimationLocations, 50);
+        drivingRightAnimation = new Animation(drivingRightAnimationLocations, 50);
+        drivingVeryRightAnimation = new Animation(drivingVeryRightAnimationLocations, 50);
+
+        drivingSlightlyLeftAnimation = new Animation(drivingSlightlyLeftAnimationLocations, 50);
+        drivingLeftAnimation = new Animation(drivingLeftAnimationLocations, 50);
+        drivingVeryLeftAnimation = new Animation(drivingVeryLeftAnimationLocations, 50);
+        
 
         start();
     }
@@ -72,10 +121,21 @@ public class Car extends Thread implements KeyListener {
         else if(velocity >= maxVelocity) velocity = maxVelocity;
 
         // move the car's angle accordingly to its velocity and state
-        if(right) angle += baseAngleChange * deltaTime * (velocity != 0 ? 1 : 0) * (velocity < maxVelocity / 2 ? 3 : 1);
-        else if(left) angle -= baseAngleChange * deltaTime * (velocity != 0 ? 1 : 0) * (velocity < maxVelocity / 2 ? 3 : 1);
+        if(right) angle += baseAngleChange * deltaTime * (velocity > 0.015f ? 1 : 0) * (velocity < maxVelocity / 2.5f ? 3 : 1);
+        else if(left) angle -= baseAngleChange * deltaTime * (velocity > 0.015f ? 1 : 0) * (velocity < maxVelocity / 2.5f ? 3 : 1);
 
         drivingAnimation.setInterval((int) velocity);
+
+        drivingSlightlyRightAnimation.setInterval((int) velocity);
+        drivingRightAnimation.setInterval((int) velocity);
+        drivingVeryRightAnimation.setInterval((int) velocity);
+
+        drivingSlightlyLeftAnimation.setInterval((int) velocity);
+        drivingLeftAnimation.setInterval((int) velocity);
+        drivingVeryLeftAnimation.setInterval((int) velocity);
+        
+        if(right || left) turnTime += deltaTime;
+        else turnTime = 0;
     }
 
     public void draw(Graphics g) {
@@ -85,12 +145,82 @@ public class Car extends Thread implements KeyListener {
 
         // decide which animation to show
         if(velocity > 0){
-            g2.drawImage(drivingAnimation.getImage(deltaTime), (int) playerX, (int) playerY, playerWidth, playerHeight, null);
+            if(turnTime > 0){
+                if(turnTime < 100 || velocity > maxVelocity / 2){
+                    if(left){
+                        outImage = drivingSlightlyLeftAnimation.getImage(deltaTime);
+                    }
+
+                    else{
+                        outImage = drivingSlightlyRightAnimation.getImage(deltaTime);
+                    }
+                }
+
+                else if(turnTime < 200 || velocity > velocity / 1.3f){
+                    if(left){
+                        outImage = drivingLeftAnimation.getImage(deltaTime);
+                    }
+
+                    else{
+                        outImage = drivingRightAnimation.getImage(deltaTime);
+                    }
+                }
+
+                else{
+                    if(left){
+                        outImage = drivingVeryLeftAnimation.getImage(deltaTime);
+                    }
+
+                    else{
+                        outImage = drivingVeryRightAnimation.getImage(deltaTime);
+                    }
+                }
+            }
+
+            else{
+                outImage = drivingAnimation.getImage(deltaTime);
+            }
         }
 
         else {
-            g2.drawImage(Stationary, (int) playerX, (int) playerY, playerWidth, playerHeight, null);
+            if(turnTime > 0){
+                if(turnTime < 100){
+                    if(left){
+                        outImage = stationarySlightlyLeftImage;
+                    }
+
+                    else{
+                        outImage = stationarySlightlyRightImage;
+                    }
+                }
+
+                else if(turnTime < 200){
+                    if(left){
+                        outImage = stationaryLeftImage;
+                    }
+
+                    else{
+                        outImage = stationaryRightImage;
+                    }
+                }
+
+                else{
+                    if(left){
+                        outImage = stationaryVeryLeftImage;
+                    }
+
+                    else{
+                        outImage = stationaryVeryRightImage;
+                    }
+                }
+            }
+
+            else{
+                outImage = Stationary;
+            }
         }
+
+        g2.drawImage(outImage, (int) playerX, (int) playerY, playerWidth, playerHeight, null);
     }
 
     @Override
