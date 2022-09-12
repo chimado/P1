@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.ArrayList;
 
 import static org.chimado.TrackScreen.height;
 
@@ -17,17 +18,27 @@ public class Car extends Thread implements KeyListener {
 
     private final Set<Character> pressedKeys = new HashSet<Character>();
     private final int playerWidth = 50, playerHeight = 70;
-    private final float timeModifier = 1f, baseAcceleration = 0.0001f, baseAngleChange = 0.1f;
+    private final float baseAcceleration = 0.0001f, baseAngleChange = 0.1f;
     public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false;
     private long deltaTime = 0;
     Instant start, finish;
-    Image Texture;
+    Image Stationary;
+    Animation drivingAnimation;
+    ArrayList<String> drivingAnimationLocations;
 
     public Car(TrackScreen panel)
     {
         this.panel = panel;
-        Texture = new ImageIcon("src/main/resources/carStationary.png").getImage();
+
+        drivingAnimationLocations = new ArrayList<String>();
+        drivingAnimationLocations.add("src/main/resources/CarMoving1.png");
+        drivingAnimationLocations.add("src/main/resources/CarMoving2.png");
+        drivingAnimationLocations.add("src/main/resources/CarMoving3.png");
+
+
+        Stationary = new ImageIcon("src/main/resources/carStationary.png").getImage();
+        drivingAnimation = new Animation(drivingAnimationLocations, 50);
 
         start();
     }
@@ -46,7 +57,6 @@ public class Car extends Thread implements KeyListener {
 
             finish = Instant.now();
             deltaTime = Duration.between(start, finish).toMillis();
-            System.out.println(deltaTime);
         }
     }
 
@@ -69,7 +79,14 @@ public class Car extends Thread implements KeyListener {
         Graphics2D g2 = (Graphics2D)g;
         Point p = new Point((int) (playerX+playerWidth/2), (int) (playerY+playerHeight/2));
         g2.rotate(Math.toRadians(angle), p.x,p.y);
-        g2.drawImage(Texture, (int) playerX, (int) playerY, playerWidth, playerHeight, null);
+
+        if(velocity > 0){
+            g2.drawImage(drivingAnimation.getImage(deltaTime), (int) playerX, (int) playerY, playerWidth, playerHeight, null);
+        }
+
+        else {
+            g2.drawImage(Stationary, (int) playerX, (int) playerY, playerWidth, playerHeight, null);
+        }
     }
 
     @Override
