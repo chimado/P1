@@ -3,10 +3,10 @@ import java.awt.*;
 import javax.swing.*;
 
 public class TrackScreen extends JPanel{
-    public static int width = 1920, height = 1080;
-    Image track;
-    P1 p1;
-    Car player;
+    public static int width = 1920, height = 1080; // screen size
+    Image track; // track image
+    P1 p1; // game
+    Car player; // a player
 
     public TrackScreen()
     {
@@ -27,6 +27,7 @@ public class TrackScreen extends JPanel{
 
     public static void main(String[] args)
     {
+        // set some technical values
         JFrame frame = new JFrame("P1");
         TrackScreen trackscreen = new TrackScreen();
         frame.add(trackscreen);

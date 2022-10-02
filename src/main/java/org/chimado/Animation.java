@@ -19,6 +19,7 @@ public class Animation{
     public Image getImage(long deltaTime){
         frameDeltaTime += deltaTime;
 
+        // if a set amount of time has passed change the frame
         if(frameDeltaTime >= interval){
             currentFrame++;
 

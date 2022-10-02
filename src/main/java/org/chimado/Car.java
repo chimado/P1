@@ -20,13 +20,17 @@ public class Car extends Thread implements KeyListener {
     private final int playerWidth = 50, playerHeight = 70; // player dimensions
     private final float baseAcceleration = 0.0001f, baseAngleChange = 0.02f, maxVelocity = 40f;
     public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
-    public Boolean throttle = false, breaks = false, left = false, right = false;
-    private long deltaTime = 0, turnTime = 0;
+    public Boolean throttle = false, breaks = false, left = false, right = false; // player state info
+    private long deltaTime = 0, turnTime = 0; // various timers
+    // timestamps for the start and finish of an update
     Instant start, finish;
+    // images for the stationary car
     Image Stationary, stationarySlightlyRightImage, stationaryRightImage, stationaryVeryRightImage,
             stationarySlightlyLeftImage, stationaryLeftImage, stationaryVeryLeftImage, outImage;
+    // animations for the driving car
     Animation drivingAnimation, drivingSlightlyRightAnimation, drivingRightAnimation, drivingVeryRightAnimation,
             drivingSlightlyLeftAnimation, drivingLeftAnimation, drivingVeryLeftAnimation;
+    // the locations for the animation's images
     ArrayList<String> drivingAnimationLocations, drivingSlightlyRightAnimationLocations, 
             drivingRightAnimationLocations, drivingVeryRightAnimationLocations,
             drivingSlightlyLeftAnimationLocations, drivingLeftAnimationLocations, drivingVeryLeftAnimationLocations;
@@ -86,7 +90,6 @@ public class Car extends Thread implements KeyListener {
         drivingSlightlyLeftAnimation = new Animation(drivingSlightlyLeftAnimationLocations, 50);
         drivingLeftAnimation = new Animation(drivingLeftAnimationLocations, 50);
         drivingVeryLeftAnimation = new Animation(drivingVeryLeftAnimationLocations, 50);
-        
 
         start();
     }
@@ -95,7 +98,7 @@ public class Car extends Thread implements KeyListener {
     {
         while(true)
         {
-            start = Instant.now();
+            start = Instant.now(); // start of update
             updatePlayer(); // update player location, velocity and angle
             panel.repaint(); // repaints accordingly to the updated values
 
@@ -103,12 +106,13 @@ public class Car extends Thread implements KeyListener {
                 Thread.sleep(1);
             } catch (InterruptedException e) {}
 
-            finish = Instant.now();
-            deltaTime = Duration.between(start, finish).toMillis();
+            finish = Instant.now(); // end of update
+            deltaTime = Duration.between(start, finish).toMillis(); // capture the frame's duration
         }
     }
 
     private void updatePlayer() {
+        // update the car's position according to its velocity
         playerX += Math.sin(Math.toRadians(angle)) * velocity * deltaTime;
         playerY -= Math.cos(Math.toRadians(angle)) * velocity * deltaTime;
 
@@ -263,6 +267,7 @@ public class Car extends Thread implements KeyListener {
     public void keyReleased(KeyEvent e) {
         pressedKeys.remove((char) e.getKeyCode());
 
+        // change player state according to unpressed keys
         switch (e.getKeyCode()) {
             case KeyEvent.VK_W:
                 throttle = false;
