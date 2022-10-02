@@ -12,9 +12,9 @@ public class TrackScreen extends JPanel{
     public TrackScreen()
     {
         topBorder = new Collider(width, 2, 0, 0);
-        bottomBorder = new Collider(width, 2, 0, height - 300);
-        leftBorder = new Collider(2, height, 2, 0);
-        rightBorder = new Collider(2, height, width, 0);
+        bottomBorder = new Collider(width, 2, 0, height - 235);
+        leftBorder = new Collider(2, height, 5, 0);
+        rightBorder = new Collider(2, height, width - 490, 0);
 
         //track = (new ImageIcon("src/main/resources/track.png")).getImage();
         p1 = new P1(this);
