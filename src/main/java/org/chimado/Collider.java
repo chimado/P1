@@ -32,8 +32,8 @@ public class Collider {
     // check if this object is colliding with another
     public boolean isColliding(Collider object)
     {
-        if(object.getX1() > x1 && object.getX2() < x1 && object.getY1() > y1 && object.getY2() < y1 ||
-                object.getX1() > x2 && object.getX2() < x2 && object.getY1() > y2 && object.getY2() < y2)
+        if(object.getX1() < x1 && object.getX2() > x1 && object.getY1() < y1 && object.getY2() > y1 ||
+                object.getX1() < x2 && object.getX2() > x2 && object.getY1() < y2 && object.getY2() > y2)
         {
             return true;
         }

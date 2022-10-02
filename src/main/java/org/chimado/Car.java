@@ -11,8 +11,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.ArrayList;
 
-import static org.chimado.TrackScreen.height;
-import static org.chimado.TrackScreen.width;
+import static org.chimado.TrackScreen.*;
 
 public class Car extends Thread implements KeyListener {
     TrackScreen panel;
@@ -20,7 +19,7 @@ public class Car extends Thread implements KeyListener {
     private final Set<Character> pressedKeys = new HashSet<Character>(); // contains all the currently pressed keys
     private final int playerWidth = 50, playerHeight = 70; // player dimensions
     private final float baseAcceleration = 0.0001f, baseAngleChange = 0.02f, maxVelocity = 40f;
-    public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
+    public float playerX = 20, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false; // player state info
     private long deltaTime = 0, turnTime = 0; // various timers
     public Collider carCollider;
@@ -146,6 +145,11 @@ public class Car extends Thread implements KeyListener {
         
         if(right || left) turnTime += deltaTime;
         else turnTime = 0;
+
+        if(carCollider.isColliding(topBorder) || carCollider.isColliding(bottomBorder) ||
+                carCollider.isColliding(leftBorder) || carCollider.isColliding(rightBorder)) {
+            velocity = 0;
+        }
     }
 
     public void draw(Graphics g) {
