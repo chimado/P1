@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.ArrayList;
 
 import static org.chimado.TrackScreen.height;
+import static org.chimado.TrackScreen.width;
 
 public class Car extends Thread implements KeyListener {
     TrackScreen panel;
@@ -22,6 +23,7 @@ public class Car extends Thread implements KeyListener {
     public float playerX = 0, playerY = height / 2, velocity = 0, angle = 0;
     public Boolean throttle = false, breaks = false, left = false, right = false; // player state info
     private long deltaTime = 0, turnTime = 0; // various timers
+    public Collider carCollider;
     // timestamps for the start and finish of an update
     Instant start, finish;
     // images for the stationary car
@@ -91,6 +93,9 @@ public class Car extends Thread implements KeyListener {
         drivingLeftAnimation = new Animation(drivingLeftAnimationLocations, 50);
         drivingVeryLeftAnimation = new Animation(drivingVeryLeftAnimationLocations, 50);
 
+        // collider init
+        carCollider = new Collider(playerWidth, playerHeight, playerX, playerY);
+
         start();
     }
 
@@ -100,6 +105,7 @@ public class Car extends Thread implements KeyListener {
         {
             start = Instant.now(); // start of update
             updatePlayer(); // update player location, velocity and angle
+            carCollider.update(playerX, playerY); // update collider
             panel.repaint(); // repaints accordingly to the updated values
 
             try {
